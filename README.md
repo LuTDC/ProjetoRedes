@@ -6,5 +6,5 @@ Luana Terra do Couto - 11218917 <br>
 Paolo Victor Hitoshi Scassa - 10783312 <br>
 Yago Poletto Salgado - 10724455<br><br>
 
-Versão do Linux: Ubuntu 20.2.lts<br>
+Versão do Linux: 20.04.2 LTS<br>
 Compilador: g++<br>
