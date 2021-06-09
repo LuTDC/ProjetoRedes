@@ -64,19 +64,50 @@ int main(int argc, char *argv[]){
     loop = 1;
     while(loop) {
       //system("clear");
-      printf("Options:\n 1-\n 2-\n 3-\n");
+      printf("Seja bem vindo(a) a Cookies, nossa loja de doces virtual.");
+      printf("Options:\n 1-Cardápio\n 2-Compra\n 0-Saída\n");
       scanf("%d", &option);
       switch(option) {
-        case 1:
-          //
+        case 0://opcao de fechar o programa
+          write(MeuSocket, "Option 2", 9);
           break;
-        case 2:
-          //
+
+        case 1://opcao de exibir itens
+          printf("Temos bolos, tortas, cookies, brigadeiros, beijinhos. Digite 2 para realizar uma compra, ou 0 para sair.\n");
+          write(MeuSocket, "Option 0", 9);
           break;
-        case 3:
-          write(MeuSocket, "Option -1", 10);
+
+        case 2://opcao de realizar compra
+          int produto;
+          write(MeuSocket, "Option 1", 9);
+          printf("Faça sua compra. Digite o produto que deseja comprar.\n");
+          printf(" 1-Bolos\n 2-Tortas\n 3-Cookies\n 4-Brigadeiros\n 5-Beijinhos\n");
+            scanf("%d", &produto);
+            switch(produto){
+              case 1:
+                write(MeuSocket, "bolos", 6);
+                break;
+              case 2:
+                write(MeuSocket, "tortas", 7);
+                break;
+              case 3:
+                write(MeuSocket, "cookies", 8);
+                break;
+              case 4:
+                write(MeuSocket, "brigadeiros", 12);
+                break;
+              case 5:
+                write(MeuSocket, "beijinhos", 10);
+                break;
+              default: write(MeuSocket, "bolos", 6);
+                break;
+            }
+            read(MeuSocket, buffer, 1024);
+            printf("%s\n", buffer);
           break;
-        default:
+
+        default: 
+          write(MeuSocket, "Option 2", 9);
           break;
       }
     }

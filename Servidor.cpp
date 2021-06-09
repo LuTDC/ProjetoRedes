@@ -9,24 +9,80 @@
 #include <thread>
 #include <queue>
 
-#define limiteCliente 3
+#define limiteCliente 60
+
+int bolos = 30;
+int tortas = 0;
+int cookies = 80;
+int brigadeiros = 70;
+int beijinhos = 50;
 
 std::thread tid[limiteCliente]; //vetor de threads
 std::mutex mutexFila;
 std::queue<int> qLivre;
 
+int compra(char* produto){
+  if(strcmp(produto, "bolos") == 0){
+    if(bolos > 0){
+      bolos--;
+      return 1;
+    }
+  }else if(strcmp(produto, "tortas") == 0){
+    if(tortas > 0){
+      tortas--;
+      return 1;
+    }
+  }else if(strcmp(produto, "cookies") == 0){
+    if(cookies > 0){
+      cookies--;
+      return 1;
+    }  
+  }else if(strcmp(produto, "brigadeiros") == 0){
+    if(brigadeiros > 0){
+      brigadeiros--;
+      return 1;
+    }
+  }else{
+    if(beijinhos > 0)
+      return 1;
+  }
+  
+  return 0;
+}
+
 void options(int Peersocket, int id){
-  char* buffer;
+  char* buffer = new char[1024];
+  char produto[1024];
+
   write(Peersocket ,"Bem-vindo\r\n" , 11);
   printf("id: %d\n", id);
-  while(strcmp(buffer, "Option -1") != 0){
+  while(strcmp(buffer, "Option 2") != 0){
     printf("inside options wait for read\n");
+    printf("%s", buffer);
 		read(Peersocket , buffer, 1024);
+
+		if(strcmp(buffer, "Option 2") == 0){//Opcao de sair
+			break;
+		}
+
     printf("received: %s\n", buffer);
-  	if(strcmp(buffer, "Option 0") == 0) printf("Option 0 received.\n");
-    if(strcmp(buffer, "Option 1") == 0) printf("Option 1 received.\n");
+
+  	if(strcmp(buffer, "Option 0") == 0){
+      printf("Option 0 received.\n");
+    }
+
+    if(strcmp(buffer, "Option 1") == 0){
+      printf("Option 1 received.\n");
+      read(Peersocket, produto, 1024);
+      if(compra(produto) == 1){
+        write(Peersocket, "Agradeçemos pela compra!", 25);
+      }else{
+        write(Peersocket, "Indisponível para compra.", 26);
+      }
+    }
+
   }
-       
+
   //loop de finalizacao
 	while(1){
     // testa se conseguiu abrir a porta. Se nao, fica em loop
@@ -39,9 +95,6 @@ void options(int Peersocket, int id){
       mutexFila.unlock();
 
       // desliga thread com return
-
-      
-
       return;
     }
   } 
@@ -81,6 +134,7 @@ int main(int argc, char *argv[]){
   //conexão do socket com o IP
   if(bind(Meusocket, (struct sockaddr *) &local_addr, sizeof(struct sockaddr)) < 0){
     printf("erro bind");
+    printf("Error : %s\n", strerror(errno));
     return -1;
   }
          
@@ -97,7 +151,7 @@ int main(int argc, char *argv[]){
     printf("Peersocket accept\n");
    	Peersocket = accept(Meusocket, (struct sockaddr *) &peer_addr, &peerAddrLen);
   	if(Peersocket < 0){
-  		printf("peersocket error\n");
+  		printf("Error : %s\n", strerror(errno));
     	return -1;
   	}
     int aux = Peersocket;
@@ -109,12 +163,8 @@ int main(int argc, char *argv[]){
         id = qLivre.front();
         qLivre.pop();
         printf("accessing id %d\n", id);
-        //if(pthread_create(&tid[id], NULL, options(Peersocket, id), &Peersocket) != 0){
         tid[id] = std::thread(options, aux, id);
         tid[id].detach();
-          // uma nova thread é criada para cada cliente recorrente com config (NULL) padrao, usando a funcao options.
-          /*printf("Failed to create thread\n");
-          qLivre.push(id);*/
         
       }else {
         write(Peersocket ,"Fila Cheia\r\n" , 12);
