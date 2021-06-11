@@ -72,7 +72,7 @@ int main(int argc, char *argv[]){
           write(MeuSocket, "Option 2", 9);
           break;
 
-        case 1://opcao de exibir itens
+        case 1://opcao de exibir itens (cardapio)
           printf("Temos bolos, tortas, cookies, brigadeiros, beijinhos. Digite 2 para realizar uma compra, ou 0 para sair.\n");
           write(MeuSocket, "Option 0", 9);
           break;

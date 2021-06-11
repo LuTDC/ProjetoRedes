@@ -11,16 +11,19 @@
 
 #define limiteCliente 60
 
+// Estoque de doces da loja
 int bolos = 30;
 int tortas = 0;
 int cookies = 80;
 int brigadeiros = 70;
 int beijinhos = 50;
 
-std::thread tid[limiteCliente]; //vetor de threads
+std::thread tid[limiteCliente]; //Vetor de threads
 std::mutex mutexFila;
 std::queue<int> qLivre;
 
+// A funcao compra verifica se ha disponibilidade do doce pedido.
+// Recebe uma string com o produto e retorna um inteiro (1 se o doce estiver disponivel no estoque, 0 se nao estiver).
 int compra(char* produto){
   if(strcmp(produto, "bolos") == 0){
     if(bolos > 0){
@@ -67,11 +70,11 @@ void options(int Peersocket, int id){
 
     printf("received: %s\n", buffer);
 
-  	if(strcmp(buffer, "Option 0") == 0){
+  	if(strcmp(buffer, "Option 0") == 0){//Opcao do cardapio
       printf("Option 0 received.\n");
     }
 
-    if(strcmp(buffer, "Option 1") == 0){
+    if(strcmp(buffer, "Option 1") == 0){//Opcao de compra
       printf("Option 1 received.\n");
       read(Peersocket, produto, 1024);
       if(compra(produto) == 1){
